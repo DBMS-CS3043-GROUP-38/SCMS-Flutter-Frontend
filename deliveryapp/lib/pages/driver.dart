@@ -140,6 +140,17 @@ class _DriverScreenState extends State<DriverScreen> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          schedules.clear();
+          fetchSchedules();
+        },
+        child: Icon(
+          Icons.refresh,
+          color: Colors.white,
+        ),
+        backgroundColor: Color.fromARGB(255, 165, 0, 0),
+      ),
     );
   }
 
