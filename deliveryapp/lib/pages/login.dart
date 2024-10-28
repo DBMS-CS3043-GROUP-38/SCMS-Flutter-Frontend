@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:deliveryapp/pages/driver.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:deliveryapp/config.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -19,7 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     final response = await http.post(
-      Uri.parse('http://localhost:3000/login'),
+      Uri.parse('$apiURL/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

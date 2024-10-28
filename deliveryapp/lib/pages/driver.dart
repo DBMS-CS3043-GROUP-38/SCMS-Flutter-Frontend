@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:deliveryapp/config.dart';
 
 class DriverScreen extends StatefulWidget {
   final int emp_id;
@@ -31,8 +32,8 @@ class _DriverScreenState extends State<DriverScreen> {
 
   // Fetch schedules from the backend
   void fetchSchedules() async {
-    final response = await http.get(Uri.parse(
-        'http://localhost:3000/driver/${widget.driver_id}/schedules'));
+    final response = await http
+        .get(Uri.parse('$apiURL/driver/${widget.driver_id}/schedules'));
     if (response.statusCode == 500) {
       schedules = [];
     } else if (response.statusCode == 200) {
@@ -93,8 +94,10 @@ class _DriverScreenState extends State<DriverScreen> {
                             final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    ScheduleDetailScreen(schedule: schedule),
+                                builder: (context) => ScheduleDetailScreen(
+                                  schedule: schedule,
+                                  driver_id: widget.driver_id,
+                                ),
                               ),
                             );
 
@@ -229,8 +232,10 @@ class _DriverScreenState extends State<DriverScreen> {
 class ScheduleDetailScreen extends StatefulWidget {
   final Map<String, dynamic>
       schedule; // Expecting a map containing schedule details
+  final int driver_id;
 
-  const ScheduleDetailScreen({Key? key, required this.schedule})
+  const ScheduleDetailScreen(
+      {Key? key, required this.schedule, required this.driver_id})
       : super(key: key);
 
   @override
@@ -252,7 +257,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
   //   final scheduleId = widget.schedule['TruckScheduleID'];
 
   //   final url =
-  //       'http://localhost:3000/begin-delivery'; // Replace with your backend URL
+  //       'http://$apiURL/begin-delivery'; // Replace with your backend URL
 
   //   try {
   //     final response = await http.post(
@@ -266,12 +271,36 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
   //   } catch (error) {}
   // }
 
+  Future<void> _checkAndStartDeliver() async {
+    try {
+      final response = await http
+          .get(Uri.parse('$apiURL/${widget.driver_id}/hasInProgress'));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        bool hasInProgress = data['hasInProgress'];
+
+        if (hasInProgress) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('You already have a Delivery In Progress!')),
+          );
+        } else {
+          _updateStatus("In Progress");
+        }
+      } else {
+        print(
+            'Failed to check progress status. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error checking progress status: $e');
+    }
+  }
+
   // Function to handle status update
   Future<void> _updateStatus(String newStatus) async {
     final scheduleId = widget.schedule['TruckScheduleID'];
 
-    final url =
-        'http://localhost:3000/update-status'; // Replace with your backend URL
+    final url = '$apiURL/update-status'; // Replace with your backend URL
 
     try {
       final response = await http.post(
@@ -303,7 +332,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final routeId = widget.schedule['RouteID'];
-    final truckId = widget.schedule['truckID'];
+    final truckId = widget.schedule['TruckID'];
     final scheduleId = widget.schedule['TruckScheduleID'];
     final assistantName = widget.schedule['Name'];
     final departureDate = widget.schedule['ScheduleDateTime'].split('T')[0];
@@ -418,8 +447,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                       showButton = false;
                       activated = false;
                     } else {
-                      _updateStatus('In Progress');
-                      //beginDelivery(scheduleId);
+                      _checkAndStartDeliver();
                       activated = true;
                     }
                   },
