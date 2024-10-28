@@ -79,7 +79,8 @@ class _DriverScreenState extends State<DriverScreen> {
                       itemCount: schedules.length,
                       itemBuilder: (context, index) {
                         final schedule = schedules[index];
-
+                        final isInProgress =
+                            schedule['Status'] == 'In Progress';
                         // Parse and format the date/time from the schedule
                         final DateTime dateTime =
                             DateTime.parse(schedule['ScheduleDateTime']);
@@ -97,6 +98,12 @@ class _DriverScreenState extends State<DriverScreen> {
                               ),
                             );
 
+                            if (schedule['Status'] == 'In Progress') {
+                              setState(() {
+                                refreshSchedules();
+                              });
+                            }
+
                             if (schedule['Status'] == 'Completed') {
                               setState(() {
                                 schedules.removeWhere((s) =>
@@ -109,7 +116,9 @@ class _DriverScreenState extends State<DriverScreen> {
                             margin: EdgeInsets.symmetric(vertical: 8.0),
                             padding: EdgeInsets.all(16.0),
                             decoration: BoxDecoration(
-                              color: Colors.blue[100],
+                              color: isInProgress
+                                  ? Colors.green
+                                  : Colors.blue[100],
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
@@ -141,10 +150,7 @@ class _DriverScreenState extends State<DriverScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          schedules.clear();
-          fetchSchedules();
-        },
+        onPressed: refreshSchedules,
         child: Icon(
           Icons.refresh,
           color: Colors.white,
@@ -152,6 +158,11 @@ class _DriverScreenState extends State<DriverScreen> {
         backgroundColor: Color.fromARGB(255, 165, 0, 0),
       ),
     );
+  }
+
+  void refreshSchedules() {
+    schedules.clear();
+    fetchSchedules();
   }
 
   Widget _buildDrawer() {
