@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert'; // For JSON encoding/decoding
 import 'package:http/http.dart' as http; // For HTTP requests
+import 'package:deliveryapp/config.dart';
 
 class EmployeeDetailScreen extends StatefulWidget {
   final int employeeId;
@@ -25,7 +26,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   // Function to fetch employee details from the server
   Future<void> _fetchEmployeeDetails() async {
     final url = Uri.parse(
-        'http://localhost:3000/get-employee/${widget.employeeId}'); // Replace with your server URL
+        '$apiURL/get-employee/${widget.employeeId}'); // Replace with your server URL
 
     try {
       final response = await http.get(url);
