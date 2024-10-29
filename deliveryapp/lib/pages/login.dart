@@ -116,6 +116,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Color.fromARGB(255, 170, 0, 0),
                               ),
                             ),
+                            Text(
+                              'Employee Terminal',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromARGB(255, 123, 0, 0),
+                              ),
+                            ),
                             SizedBox(
                               height: 20,
                             ),
