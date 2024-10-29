@@ -469,7 +469,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                 height: 10,
               ),
               Visibility(
-                visible: activated ? true : false,
+                visible: isInProgress ? true : false,
                 child: ElevatedButton(
                   onPressed: () {
                     if (isInProgress) {
