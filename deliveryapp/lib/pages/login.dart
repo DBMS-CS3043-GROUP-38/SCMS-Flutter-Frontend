@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:deliveryapp/pages/driver.dart';
+import 'package:deliveryapp/pages/assistant.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:deliveryapp/config.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -19,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     final response = await http.post(
-      Uri.parse('http://localhost:3000/login'),
+      Uri.parse('$apiURL/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -57,7 +59,16 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
         } else if (data['type'] == 'Assistant') {
-          // Implement navigation for Assistant screen here if needed
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AssistantScreen(
+                emp_id: data['emp_id'],
+                assistant_id: data['id'],
+                assistant_name: data['name'],
+              ),
+            ),
+          );
         } else {
           // Handle other user types if needed
         }
