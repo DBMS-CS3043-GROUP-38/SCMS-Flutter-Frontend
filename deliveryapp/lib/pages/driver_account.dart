@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:convert'; // For JSON encoding/decoding
-import 'package:http/http.dart' as http; // For HTTP requests
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:deliveryapp/config.dart';
 
 class EmployeeDetailScreen extends StatefulWidget {
@@ -20,13 +20,11 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchEmployeeDetails(); // Fetch employee details when the screen is loaded
+    _fetchEmployeeDetails();
   }
 
-  // Function to fetch employee details from the server
   Future<void> _fetchEmployeeDetails() async {
-    final url = Uri.parse(
-        '$apiURL/get-employee/${widget.employeeId}'); // Replace with your server URL
+    final url = Uri.parse('$apiURL/get-employee/${widget.employeeId}');
 
     try {
       final response = await http.get(url);
@@ -34,11 +32,6 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
       if (response.statusCode == 200) {
         setState(() {
           employeeDetails = json.decode(response.body);
-          isLoading = false;
-        });
-      } else if (response.statusCode == 404) {
-        setState(() {
-          isError = true;
           isLoading = false;
         });
       } else {
@@ -62,33 +55,123 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
       appBar: AppBar(
         title: Text('Employee Details'),
       ),
-      body: isLoading
-          ? Center(
-              child:
-                  CircularProgressIndicator()) // Show loading spinner while fetching
-          : isError
-              ? Center(child: Text('Error loading employee details'))
-              : Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Name: ${employeeDetails!['Name']}',
-                          style: TextStyle(fontSize: 18)),
-                      Text('Username: ${employeeDetails!['Username']}',
-                          style: TextStyle(fontSize: 18)),
-                      Text('Address: ${employeeDetails!['Address'] ?? 'N/A'}',
-                          style: TextStyle(fontSize: 18)),
-                      Text('Contact: ${employeeDetails!['Contact'] ?? 'N/A'}',
-                          style: TextStyle(fontSize: 18)),
-                      Text('Role: ${employeeDetails!['Type']}',
-                          style: TextStyle(fontSize: 18)),
-                      Text(
-                          'Worked Hours: ${employeeDetails!['CompletedHours']}/${employeeDetails!['WorkingHours']}',
-                          style: TextStyle(fontSize: 18)),
-                    ],
+      body: Center(
+        child: isLoading
+            ? CircularProgressIndicator()
+            : isError
+                ? Text('Error loading employee details')
+                : Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _buildEmployeeInfoCard(),
+                        SizedBox(height: 16),
+                        _buildProgressCard(),
+                      ],
+                    ),
                   ),
-                ),
+      ),
+    );
+  }
+
+  Widget _buildEmployeeInfoCard() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Employee Details',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.redAccent,
+              ),
+            ),
+            SizedBox(height: 16),
+            if (employeeDetails != null) ...[
+              _buildInfoRow('Name', employeeDetails!['Name']),
+              _buildInfoRow('Username', employeeDetails!['Username']),
+              _buildInfoRow('Address', employeeDetails!['Address'] ?? 'N/A'),
+              _buildInfoRow('Contact', employeeDetails!['Contact'] ?? 'N/A'),
+              _buildInfoRow('Role', employeeDetails!['Type']),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProgressCard() {
+    final completedHours = employeeDetails!['CompletedHours'] ?? 0;
+    final totalHours = employeeDetails!['WorkingHours'] ?? 1;
+    final progress = (completedHours / totalHours).clamp(0.0, 1.0);
+
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Working Hours Progress',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueAccent,
+              ),
+            ),
+            SizedBox(height: 12),
+            Text(
+              'Completed: $completedHours / $totalHours hours',
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 8),
+            LinearProgressIndicator(
+              value: progress,
+              backgroundColor: Colors.grey[300],
+              color: Colors.green[600],
+              minHeight: 12,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$label: ',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[700],
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(fontSize: 16, color: Colors.grey[800]),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
