@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:deliveryapp/config.dart';
+import 'package:intl/intl.dart';
 
 class EmployeeDetailScreen extends StatefulWidget {
   final int employeeId;
@@ -110,9 +111,30 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   }
 
   Widget _buildProgressCard() {
-    final completedHours = employeeDetails!['CompletedHours'] ?? 0;
-    final totalHours = employeeDetails!['WorkingHours'] ?? 1;
-    final progress = (completedHours / totalHours).clamp(0.0, 1.0);
+    String tempcompletedHours = employeeDetails!['CompletedHours'];
+    String temptotalHours = employeeDetails!['WorkingHours'];
+
+    List<String> parts1 = tempcompletedHours.split(":");
+    List<String> parts2 = temptotalHours.split(":");
+
+    int hours1 = int.parse(parts1[0]);
+    int minutes1 = int.parse(parts1[1]);
+    int seconds1 = int.parse(parts1[2]);
+
+    int hours2 = int.parse(parts2[0]);
+    int minutes2 = int.parse(parts2[1]);
+    int seconds2 = int.parse(parts2[2]);
+
+    Duration dur1 =
+        Duration(hours: hours1, minutes: minutes1, seconds: seconds1);
+    Duration dur2 =
+        Duration(hours: hours2, minutes: minutes2, seconds: seconds2);
+
+    print(dur1);
+    print(dur2);
+
+    final progress =
+        ((dur1.inSeconds / 1.0) / (dur2.inSeconds / 1.0)).clamp(0.0, 1.0);
 
     return Card(
       elevation: 4,
@@ -134,7 +156,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
             ),
             SizedBox(height: 12),
             Text(
-              'Completed: $completedHours / $totalHours hours',
+              'Completed: $tempcompletedHours / $temptotalHours hours',
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 8),
