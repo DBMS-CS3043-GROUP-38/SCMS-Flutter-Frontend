@@ -1,2 +1,4 @@
-const String apiURL = "http://localhost:3005/driver";
-const String apiURL2 = "http://localhost:3005/assistant";
+const root = "http://localhost:3005/";
+
+const String apiURL = root + "driver";
+const String apiURL2 = root + "assistant";
