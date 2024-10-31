@@ -4,8 +4,11 @@ import 'package:deliveryapp/pages/driver.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:deliveryapp/config.dart';
+import 'package:deliveryapp/pages/ipconfig.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -21,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     final response = await http.post(
-      Uri.parse('$apiURL/login'),
+      Uri.parse('${ApiConfig.apiURL}/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -40,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Server Error'),
+          title: const Text('Server Error'),
           content: Text(data['error']),
         ),
       );
@@ -76,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Login Failed'),
+            title: const Text('Login Failed'),
             content: Text(data['message']),
           ),
         );
@@ -102,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.9), // Set opacity here
@@ -118,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         padding: const EdgeInsets.all(20.0),
                         child: Column(
                           children: [
-                            Text(
+                            const Text(
                               'Company A',
                               style: TextStyle(
                                 fontSize: 40,
@@ -126,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Color.fromARGB(255, 170, 0, 0),
                               ),
                             ),
-                            Text(
+                            const Text(
                               'Employee Terminal',
                               style: TextStyle(
                                 fontSize: 15,
@@ -134,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Color.fromARGB(255, 123, 0, 0),
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
                             TextField(
@@ -147,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
                             TextField(
                               controller: _passwordController,
                               decoration: InputDecoration(
@@ -158,23 +161,23 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               obscureText: true,
                             ),
-                            SizedBox(height: 30),
+                            const SizedBox(height: 30),
                             _isLoading
-                                ? CircularProgressIndicator()
+                                ? const CircularProgressIndicator()
                                 : SizedBox(
                                     width: double.infinity,
                                     child: ElevatedButton(
                                       onPressed: login,
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.red[700],
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 16),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 16),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
                                         ),
                                       ),
-                                      child: Text(
+                                      child: const Text(
                                         'Login',
                                         style: TextStyle(
                                           fontSize: 18,

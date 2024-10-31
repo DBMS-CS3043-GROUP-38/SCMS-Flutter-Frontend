@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:deliveryapp/config.dart';
+import 'package:deliveryapp/pages/ipconfig.dart';
 
 class OrdersScreen extends StatefulWidget {
   final int shipment_id;
 
-  OrdersScreen({required this.shipment_id});
+  const OrdersScreen({super.key, required this.shipment_id});
 
   @override
   State<OrdersScreen> createState() => _OrdersScreenState();
@@ -25,7 +26,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   // Fetch orders from the backend
   void fetchOrders() async {
     final response = await http
-        .get(Uri.parse('$apiURL2/assistant/${widget.shipment_id}/get-orders'));
+        .get(Uri.parse('${ApiConfig.apiURL2}/assistant/${widget.shipment_id}/get-orders'));
     if (response.statusCode == 500) {
       orders = [];
     } else if (response.statusCode == 200) {
@@ -41,7 +42,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       BuildContext context, int orderId, String cusName, String address) {}
 
   Future<bool> markAsDelivered(int orderId) async {
-    final url = Uri.parse('$apiURL2/mark-delivered');
+    final url = Uri.parse('${ApiConfig.apiURL2}/mark-delivered');
     try {
       final response = await http.post(
         url,
@@ -62,7 +63,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   }
 
   Future<bool> revertDelivery(int orderId) async {
-    final url = Uri.parse('$apiURL2/revert-delivered');
+    final url = Uri.parse('${ApiConfig.apiURL2}/revert-delivered');
     try {
       final response = await http.post(
         url,
@@ -113,24 +114,24 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Orders in Schedule'),
+        title: const Text('Orders in Schedule'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Expanded(
               child: orders.isEmpty
-                  ? Center(child: Text('Nothing to Show!'))
+                  ? const Center(child: Text('Nothing to Show!'))
                   : ListView.builder(
                       itemCount: orders.length,
                       itemBuilder: (context, index) {
                         final order = orders[index];
-                        int order_id = order['OrderID'];
+                        int orderId = order['OrderID'];
                         String cusName = order['Name'];
                         String address = order['Address'];
                         bool isDelivered = order['IsDelivered'] == 1;
@@ -141,16 +142,16 @@ class _OrdersScreenState extends State<OrdersScreen> {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title: Text('Order Details'),
+                                  title: const Text('Order Details'),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text('Order ID: $order_id'),
-                                      SizedBox(height: 8),
+                                      Text('Order ID: $orderId'),
+                                      const SizedBox(height: 8),
                                       Text('Customer Name: $cusName'),
-                                      SizedBox(height: 8),
+                                      const SizedBox(height: 8),
                                       Text('Address: $address'),
                                     ],
                                   ),
@@ -161,14 +162,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                           Navigator.of(context).pop();
                                           toggleDeliveryStatus(index);
                                         },
-                                        child: Text(
-                                          isDelivered
-                                              ? 'Mark as Not Delivered'
-                                              : 'Mark as Delivered',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
                                         style: ElevatedButton.styleFrom(
-                                          padding: EdgeInsets.symmetric(
+                                          padding: const EdgeInsets.symmetric(
                                               horizontal: 40, vertical: 15),
                                           backgroundColor: isDelivered
                                               ? Colors.red
@@ -178,6 +173,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                                 20), // Rounded edges
                                           ),
                                         ),
+                                        child: Text(
+                                          isDelivered
+                                              ? 'Mark as Not Delivered'
+                                              : 'Mark as Delivered',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -186,13 +187,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
                             );
                           },
                           child: Container(
-                            margin: EdgeInsets.symmetric(vertical: 8.0),
-                            padding: EdgeInsets.all(16.0),
+                            margin: const EdgeInsets.symmetric(vertical: 8.0),
+                            padding: const EdgeInsets.all(16.0),
                             decoration: BoxDecoration(
                               color:
                                   isDelivered ? Colors.green : Colors.blue[100],
                               borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
+                              boxShadow: const [
                                 BoxShadow(
                                   color: Colors.black26,
                                   offset: Offset(0, 2),
@@ -204,8 +205,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Order ID: ' + order_id.toString(),
-                                  style: TextStyle(
+                                  'Order ID: ' + orderId.toString(),
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -217,14 +218,14 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                   children: [
                                     Text(
                                       cusName,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     Text(
                                       address,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                       ),

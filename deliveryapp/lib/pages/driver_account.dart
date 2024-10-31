@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:deliveryapp/config.dart';
 import 'package:intl/intl.dart';
+import 'package:deliveryapp/pages/ipconfig.dart';
 
 class EmployeeDetailScreen extends StatefulWidget {
   final int employeeId;
 
-  EmployeeDetailScreen({required this.employeeId});
+  const EmployeeDetailScreen({super.key, required this.employeeId});
 
   @override
   _EmployeeDetailScreenState createState() => _EmployeeDetailScreenState();
@@ -25,7 +26,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   }
 
   Future<void> _fetchEmployeeDetails() async {
-    final url = Uri.parse('$apiURL/get-employee/${widget.employeeId}');
+    final url = Uri.parse('${ApiConfig.apiURL}/get-employee/${widget.employeeId}');
 
     try {
       final response = await http.get(url);
@@ -54,20 +55,20 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Employee Details'),
+        title: const Text('Employee Details'),
       ),
       body: Center(
         child: isLoading
-            ? CircularProgressIndicator()
+            ? const CircularProgressIndicator()
             : isError
-                ? Text('Error loading employee details')
+                ? const Text('Error loading employee details')
                 : Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         _buildEmployeeInfoCard(),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         _buildProgressCard(),
                       ],
                     ),
@@ -88,7 +89,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            const Text(
               'Employee Details',
               style: TextStyle(
                 fontSize: 22,
@@ -96,7 +97,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                 color: Colors.redAccent,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             if (employeeDetails != null) ...[
               _buildInfoRow('Name', employeeDetails!['Name']),
               _buildInfoRow('Username', employeeDetails!['Username']),
@@ -146,7 +147,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Working Hours Progress',
               style: TextStyle(
                 fontSize: 20,
@@ -154,12 +155,12 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                 color: Colors.blueAccent,
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
               'Completed: $tempcompletedHours / $temptotalHours hours',
-              style: TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             LinearProgressIndicator(
               value: progress,
               backgroundColor: Colors.grey[300],

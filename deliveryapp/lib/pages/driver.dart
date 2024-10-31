@@ -5,14 +5,16 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:deliveryapp/config.dart';
+import 'package:deliveryapp/pages/ipconfig.dart';
 
 class DriverScreen extends StatefulWidget {
   final int emp_id;
   final int driver_id;
   final String driver_name;
 
-  DriverScreen(
-      {required this.emp_id,
+  const DriverScreen(
+      {super.key,
+      required this.emp_id,
       required this.driver_id,
       required this.driver_name});
 
@@ -33,7 +35,7 @@ class _DriverScreenState extends State<DriverScreen> {
   // Fetch schedules from the backend
   void fetchSchedules() async {
     final response = await http
-        .get(Uri.parse('$apiURL/driver/${widget.driver_id}/schedules'));
+        .get(Uri.parse('${ApiConfig.apiURL}/driver/${widget.driver_id}/schedules'));
     if (response.statusCode == 404) {
       schedules = [];
     } else if (response.statusCode == 200) {
@@ -52,30 +54,30 @@ class _DriverScreenState extends State<DriverScreen> {
       appBar: AppBar(
         title: Text(
           'Hello, ' + widget.driver_name + "!",
-          style: TextStyle(
+          style: const TextStyle(
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
         ),
-        backgroundColor: Color.fromARGB(255, 141, 0, 0),
+        backgroundColor: const Color.fromARGB(255, 141, 0, 0),
       ),
       drawer: _buildDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            Text(
+            const Text(
               'Your Schedules',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Expanded(
               child: schedules.isEmpty
-                  ? Center(child: Text('Nothing to Show!'))
+                  ? const Center(child: Text('Nothing to Show!'))
                   : ListView.builder(
                       itemCount: schedules.length,
                       itemBuilder: (context, index) {
@@ -118,14 +120,14 @@ class _DriverScreenState extends State<DriverScreen> {
                             }
                           },
                           child: Container(
-                            margin: EdgeInsets.symmetric(vertical: 8.0),
-                            padding: EdgeInsets.all(16.0),
+                            margin: const EdgeInsets.symmetric(vertical: 8.0),
+                            padding: const EdgeInsets.all(16.0),
                             decoration: BoxDecoration(
                               color: isInProgress
                                   ? Colors.green
                                   : Colors.blue[100],
                               borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
+                              boxShadow: const [
                                 BoxShadow(
                                   color: Colors.black26,
                                   offset: Offset(0, 2),
@@ -138,12 +140,12 @@ class _DriverScreenState extends State<DriverScreen> {
                               children: [
                                 Text(
                                   formattedDateTime,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Icon(Icons.arrow_forward),
+                                const Icon(Icons.arrow_forward),
                               ],
                             ),
                           ),
@@ -156,11 +158,11 @@ class _DriverScreenState extends State<DriverScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: refreshSchedules,
+        backgroundColor: const Color.fromARGB(255, 165, 0, 0),
         child: Icon(
           Icons.refresh,
           color: Colors.white,
         ),
-        backgroundColor: Color.fromARGB(255, 165, 0, 0),
       ),
     );
   }
@@ -176,21 +178,21 @@ class _DriverScreenState extends State<DriverScreen> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Color.fromARGB(255, 141, 0, 0),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 40,
                   backgroundImage: NetworkImage(
                       'https://via.placeholder.com/150'), // Placeholder for profile picture
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
                   widget.driver_name, // Display driver's name
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -200,8 +202,8 @@ class _DriverScreenState extends State<DriverScreen> {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Profile'),
+            leading: const Icon(Icons.person),
+            title: const Text('Profile'),
             onTap: () async {
               final result = await Navigator.push(
                 context,
@@ -213,8 +215,8 @@ class _DriverScreenState extends State<DriverScreen> {
             },
           ),
           ListTile(
-            leading: Icon(Icons.logout),
-            title: Text('Logout'),
+            leading: const Icon(Icons.logout),
+            title: const Text('Logout'),
             onTap: () {
               // Perform logout and navigate back to the login page
               Navigator.pushAndRemoveUntil(
@@ -237,8 +239,7 @@ class ScheduleDetailScreen extends StatefulWidget {
   final int driver_id;
 
   const ScheduleDetailScreen(
-      {Key? key, required this.schedule, required this.driver_id})
-      : super(key: key);
+      {super.key, required this.schedule, required this.driver_id});
 
   @override
   _ScheduleDetailScreenState createState() => _ScheduleDetailScreenState();
@@ -276,7 +277,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
   Future<void> _checkAndStartDeliver() async {
     try {
       final response = await http
-          .get(Uri.parse('$apiURL/${widget.driver_id}/hasInProgress'));
+          .get(Uri.parse('${ApiConfig.apiURL}/${widget.driver_id}/hasInProgress'));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -284,7 +285,8 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
 
         if (hasInProgress) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('You already have a Delivery In Progress!')),
+            const SnackBar(
+                content: Text('You already have a Delivery In Progress!')),
           );
         } else {
           _updateStatus("In Progress");
@@ -302,7 +304,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
   Future<void> _updateStatus(String newStatus) async {
     final scheduleId = widget.schedule['TruckScheduleID'];
 
-    final url = '$apiURL/update-status'; // Replace with your backend URL
+    var url = '${ApiConfig.apiURL}/update-status'; // Replace with your backend URL
 
     try {
       final response = await http.post(
@@ -321,7 +323,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update status')),
+          const SnackBar(content: Text('Failed to update status')),
         );
       }
     } catch (error) {
@@ -346,7 +348,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Schedule Details'),
+        title: const Text('Schedule Details'),
       ),
       body: Center(
         child: Padding(
@@ -357,7 +359,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
             children: [
               // Pop-up card for schedule details
               Container(
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
@@ -366,7 +368,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 5,
                       blurRadius: 7,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -380,7 +382,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                           fontWeight: FontWeight.bold,
                           color: Colors.grey[800]),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       'Status: $status',
                       style: TextStyle(
@@ -388,7 +390,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                           fontWeight: FontWeight.bold,
                           color: Colors.grey[800]),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       'Route ID: $routeId',
                       style: TextStyle(
@@ -396,7 +398,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                           fontWeight: FontWeight.bold,
                           color: Colors.grey[800]),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       'Number Plate: $numPlate',
                       style: TextStyle(
@@ -404,7 +406,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                           fontWeight: FontWeight.bold,
                           color: Colors.grey[800]),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       'Assistant Name: $assistantName',
                       style: TextStyle(
@@ -412,7 +414,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                           fontWeight: FontWeight.bold,
                           color: Colors.grey[800]),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       'Departure Date: $departureDate',
                       style: TextStyle(
@@ -420,7 +422,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                           fontWeight: FontWeight.bold,
                           color: Colors.grey[800]),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       'Departure Time: $departureTime',
                       style: TextStyle(
@@ -428,7 +430,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                           fontWeight: FontWeight.bold,
                           color: Colors.grey[800]),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       'Store : $storeLoc',
                       style: TextStyle(
@@ -439,7 +441,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: 20), // Space between card and button
+              const SizedBox(height: 20), // Space between card and button
 
               // Begin/End Delivery button
               Visibility(
@@ -456,7 +458,8 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 15),
                     backgroundColor:
                         isInProgress ? Colors.redAccent : Colors.blueAccent,
                     shape: RoundedRectangleBorder(
@@ -465,11 +468,11 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                   ),
                   child: Text(
                     isInProgress ? 'End Delivery' : 'Begin Delivery',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                    style: const TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               Visibility(
@@ -483,13 +486,14 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 15),
                     backgroundColor: Colors.redAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20), // Rounded edges
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Cancel',
                     style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
