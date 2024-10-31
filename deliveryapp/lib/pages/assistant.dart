@@ -177,7 +177,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
         children: <Widget>[
           DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.blueAccent,
+              color: Color.fromARGB(255, 141, 0, 0),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,24 +254,6 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
     // Set initial button state based on the schedule's status
     isInProgress = widget.schedule['Status'] == 'In Progress';
   }
-
-  // Future<void> beginDelivery(int scheduleId) async {
-  //   final scheduleId = widget.schedule['TruckScheduleID'];
-
-  //   final url =
-  //       'http://$apiURL2/begin-delivery'; // Replace with your backend URL
-
-  //   try {
-  //     final response = await http.post(
-  //       Uri.parse(url),
-  //       headers: {'Content-Type': 'application/json'},
-  //       body: jsonEncode({'TruckScheduleID': scheduleId, 'Status': 'InTruck'}),
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //     } else {}
-  //   } catch (error) {}
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -397,7 +379,10 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                       ),
                     );
                   } else {
-                    print("Not cool");
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text('This Delivery is not In Progress!')),
+                    );
                   }
                 },
                 style: ElevatedButton.styleFrom(

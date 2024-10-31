@@ -19,6 +19,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   void initState() {
     super.initState();
     fetchOrders();
+    _sortOrders();
   }
 
   // Fetch orders from the backend
@@ -81,6 +82,33 @@ class _OrdersScreenState extends State<OrdersScreen> {
     }
   }
 
+  void toggleDeliveryStatus(int index) async {
+    final order = orders[index];
+    final orderId = order['OrderID'];
+    final isDelivered = order['IsDelivered'] == 1;
+
+    bool success;
+    if (isDelivered) {
+      success = await revertDelivery(orderId);
+    } else {
+      success = await markAsDelivered(orderId);
+    }
+
+    if (success) {
+      setState(() {
+        orders[index]['IsDelivered'] = isDelivered ? 0 : 1;
+        _sortOrders();
+      });
+    }
+  }
+
+  void _sortOrders() {
+    orders.sort((a, b) {
+      if (a['IsDelivered'] == b['IsDelivered']) return 0;
+      return a['IsDelivered'] == 1 ? 1 : -1;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -130,21 +158,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                     Center(
                                       child: ElevatedButton(
                                         onPressed: () async {
-                                          if (isDelivered) {
-                                            isDelivered =
-                                                await revertDelivery(order_id);
-                                            if (!isDelivered)
-                                              setState(() {
-                                                isDelivered = false;
-                                              });
-                                          } else {
-                                            isDelivered =
-                                                await markAsDelivered(order_id);
-                                            if (isDelivered)
-                                              setState(() {
-                                                isDelivered = true;
-                                              });
-                                          }
+                                          Navigator.of(context).pop();
+                                          toggleDeliveryStatus(index);
                                         },
                                         child: Text(
                                           isDelivered

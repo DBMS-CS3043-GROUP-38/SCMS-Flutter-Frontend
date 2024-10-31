@@ -34,7 +34,7 @@ class _DriverScreenState extends State<DriverScreen> {
   void fetchSchedules() async {
     final response = await http
         .get(Uri.parse('$apiURL/driver/${widget.driver_id}/schedules'));
-    if (response.statusCode == 500) {
+    if (response.statusCode == 404) {
       schedules = [];
     } else if (response.statusCode == 200) {
       setState(() {
@@ -177,7 +177,7 @@ class _DriverScreenState extends State<DriverScreen> {
         children: <Widget>[
           DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.blueAccent,
+              color: Color.fromARGB(255, 141, 0, 0),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
