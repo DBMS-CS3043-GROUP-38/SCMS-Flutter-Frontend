@@ -375,6 +375,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                       MaterialPageRoute(
                         builder: (context) => OrdersScreen(
                           shipment_id: widget.schedule['ShipmentID'],
+                          truck_schedule_id: widget.schedule['TruckScheduleID'],
                         ),
                       ),
                     );

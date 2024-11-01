@@ -5,8 +5,9 @@ import 'package:deliveryapp/config.dart';
 
 class OrdersScreen extends StatefulWidget {
   final int shipment_id;
+  final int truck_schedule_id;
 
-  OrdersScreen({required this.shipment_id});
+  OrdersScreen({required this.shipment_id, required this.truck_schedule_id});
 
   @override
   State<OrdersScreen> createState() => _OrdersScreenState();
@@ -34,6 +35,25 @@ class _OrdersScreenState extends State<OrdersScreen> {
       });
     } else {
       throw Exception('Failed to load orders');
+    }
+  }
+
+  Future<bool> isTruckScheduleInProgress(int truckScheduleID) async {
+    final url = Uri.parse('$apiURL2/is-in-progress/$truckScheduleID');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['isInProgress'];
+      } else {
+        print("Error fetching truck schedule status: ${response.statusCode}");
+        return false;
+      }
+    } catch (error) {
+      print("Error: $error");
+      return false;
     }
   }
 
@@ -133,6 +153,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         int order_id = order['OrderID'];
                         String cusName = order['Name'];
                         String address = order['Address'];
+                        String contact = order['Contact'];
                         bool isDelivered = order['IsDelivered'] == 1;
 
                         return GestureDetector(
@@ -151,6 +172,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                       SizedBox(height: 8),
                                       Text('Customer Name: $cusName'),
                                       SizedBox(height: 8),
+                                      Text('Contact : $contact'),
+                                      SizedBox(height: 8),
                                       Text('Address: $address'),
                                     ],
                                   ),
@@ -158,8 +181,21 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                     Center(
                                       child: ElevatedButton(
                                         onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          toggleDeliveryStatus(index);
+                                          bool canIPweesh =
+                                              await isTruckScheduleInProgress(
+                                                  widget.truck_schedule_id);
+                                          if (canIPweesh) {
+                                            Navigator.of(context).pop();
+                                            toggleDeliveryStatus(index);
+                                          } else {
+                                            Navigator.of(context).pop();
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                  content: Text(
+                                                      'This Delivery is no longer In Progress!')),
+                                            );
+                                          }
                                         },
                                         child: Text(
                                           isDelivered
