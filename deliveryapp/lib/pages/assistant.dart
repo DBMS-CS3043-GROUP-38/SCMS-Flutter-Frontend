@@ -1,26 +1,27 @@
 import 'package:deliveryapp/pages/driver_account.dart';
 import 'package:deliveryapp/pages/login.dart';
+import 'package:deliveryapp/pages/orders.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:deliveryapp/config.dart';
 
-class DriverScreen extends StatefulWidget {
+class AssistantScreen extends StatefulWidget {
   final int emp_id;
-  final int driver_id;
-  final String driver_name;
+  final int assistant_id;
+  final String assistant_name;
 
-  DriverScreen(
+  AssistantScreen(
       {required this.emp_id,
-      required this.driver_id,
-      required this.driver_name});
+      required this.assistant_id,
+      required this.assistant_name});
 
   @override
-  State<DriverScreen> createState() => _DriverScreenState();
+  State<AssistantScreen> createState() => _AssistantScreenState();
 }
 
-class _DriverScreenState extends State<DriverScreen> {
+class _AssistantScreenState extends State<AssistantScreen> {
   List schedules = [];
 
   @override
@@ -33,8 +34,8 @@ class _DriverScreenState extends State<DriverScreen> {
   // Fetch schedules from the backend
   void fetchSchedules() async {
     final response = await http
-        .get(Uri.parse('$apiURL/driver/${widget.driver_id}/schedules'));
-    if (response.statusCode == 404) {
+        .get(Uri.parse('$apiURL2/assistant/${widget.assistant_id}/schedules'));
+    if (response.statusCode == 500) {
       schedules = [];
     } else if (response.statusCode == 200) {
       setState(() {
@@ -51,7 +52,7 @@ class _DriverScreenState extends State<DriverScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Hello, ' + widget.driver_name + "!",
+          'Hello, ' + widget.assistant_name + "!",
           style: TextStyle(
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
         ),
@@ -80,7 +81,6 @@ class _DriverScreenState extends State<DriverScreen> {
                       itemCount: schedules.length,
                       itemBuilder: (context, index) {
                         final schedule = schedules[index];
-                        print(schedule['ScheduleDateTime']);
                         final isInProgress =
                             schedule['Status'] == 'In Progress';
                         // Parse and format the date/time from the schedule
@@ -98,7 +98,7 @@ class _DriverScreenState extends State<DriverScreen> {
                               MaterialPageRoute(
                                 builder: (context) => ScheduleDetailScreen(
                                   schedule: schedule,
-                                  driver_id: widget.driver_id,
+                                  assistant_id: widget.assistant_id,
                                 ),
                               ),
                             );
@@ -189,7 +189,7 @@ class _DriverScreenState extends State<DriverScreen> {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  widget.driver_name, // Display driver's name
+                  widget.assistant_name, // Display assistant's name
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -234,10 +234,10 @@ class _DriverScreenState extends State<DriverScreen> {
 class ScheduleDetailScreen extends StatefulWidget {
   final Map<String, dynamic>
       schedule; // Expecting a map containing schedule details
-  final int driver_id;
+  final int assistant_id;
 
   const ScheduleDetailScreen(
-      {Key? key, required this.schedule, required this.driver_id})
+      {Key? key, required this.schedule, required this.assistant_id})
       : super(key: key);
 
   @override
@@ -255,82 +255,6 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
     isInProgress = widget.schedule['Status'] == 'In Progress';
   }
 
-  // Future<void> beginDelivery(int scheduleId) async {
-  //   final scheduleId = widget.schedule['TruckScheduleID'];
-
-  //   final url =
-  //       'http://$apiURL/begin-delivery'; // Replace with your backend URL
-
-  //   try {
-  //     final response = await http.post(
-  //       Uri.parse(url),
-  //       headers: {'Content-Type': 'application/json'},
-  //       body: jsonEncode({'TruckScheduleID': scheduleId, 'Status': 'InTruck'}),
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //     } else {}
-  //   } catch (error) {}
-  // }
-
-  Future<void> _checkAndStartDeliver() async {
-    try {
-      final response = await http
-          .get(Uri.parse('$apiURL/${widget.driver_id}/hasInProgress'));
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        bool hasInProgress = data['hasInProgress'];
-
-        if (hasInProgress) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('You already have a Delivery In Progress!')),
-          );
-        } else {
-          _updateStatus("In Progress");
-        }
-      } else {
-        print(
-            'Failed to check progress status. Status code: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error checking progress status: $e');
-    }
-  }
-
-  // Function to handle status update
-  Future<void> _updateStatus(String newStatus) async {
-    final scheduleId = widget.schedule['TruckScheduleID'];
-
-    final url = '$apiURL/update-status'; // Replace with your backend URL
-
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'TruckScheduleID': scheduleId, 'Status': newStatus}),
-      );
-
-      if (response.statusCode == 200) {
-        setState(() {
-          widget.schedule['Status'] = newStatus;
-          isInProgress = newStatus == 'In Progress';
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Status updated to $newStatus')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update status')),
-        );
-      }
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $error')),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final DateTime departureDateTime =
@@ -338,7 +262,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
     final routeId = widget.schedule['RouteID'];
     final numPlate = widget.schedule['LicencePlate'];
     final scheduleId = widget.schedule['TruckScheduleID'];
-    final assistantName = widget.schedule['AssistantName'];
+    final driverName = widget.schedule['DriverName'];
     final departureDate = DateFormat('dd MMM yyyy').format(departureDateTime);
     final departureTime = DateFormat('hh:mm a').format(departureDateTime);
     final storeLoc = widget.schedule['StoreCity'];
@@ -406,7 +330,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      'Assistant Name: $assistantName',
+                      'Driver Name: $driverName',
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -430,7 +354,7 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      'Store : $storeLoc',
+                      'Store: $storeLoc',
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -441,64 +365,66 @@ class _ScheduleDetailScreenState extends State<ScheduleDetailScreen> {
               ),
               SizedBox(height: 20), // Space between card and button
 
-              // Begin/End Delivery button
-              Visibility(
-                visible: showButton ? true : false,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (isInProgress) {
-                      _updateStatus('Completed');
-                      showButton = false;
-                      activated = false;
-                    } else {
-                      _checkAndStartDeliver();
-                      activated = true;
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    backgroundColor:
-                        isInProgress ? Colors.redAccent : Colors.blueAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20), // Rounded edges
-                    ),
+              ElevatedButton(
+                onPressed: () async {
+                  bool scheduleInProgress = await isTruckScheduleInProgress(
+                      widget.schedule["TruckScheduleID"]);
+                  if (scheduleInProgress) {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OrdersScreen(
+                          shipment_id: widget.schedule['ShipmentID'],
+                          truck_schedule_id: widget.schedule['TruckScheduleID'],
+                        ),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text('This Delivery is not In Progress!')),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  backgroundColor:
+                      isInProgress ? Colors.redAccent : Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20), // Rounded edges
                   ),
-                  child: Text(
-                    isInProgress ? 'End Delivery' : 'Begin Delivery',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
+                ),
+                child: Text(
+                  "View Orders",
+                  style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
               ),
               SizedBox(
                 height: 10,
-              ),
-              Visibility(
-                visible: isInProgress ? true : false,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (isInProgress) {
-                      _updateStatus('Not Completed');
-                      activated = false;
-                      isInProgress = false;
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    backgroundColor: Colors.redAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20), // Rounded edges
-                    ),
-                  ),
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                ),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+}
+
+Future<bool> isTruckScheduleInProgress(int truckScheduleID) async {
+  final url = Uri.parse('$apiURL2/is-in-progress/$truckScheduleID');
+
+  try {
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['isInProgress'];
+    } else {
+      print("Error fetching truck schedule status: ${response.statusCode}");
+      return false;
+    }
+  } catch (error) {
+    print("Error: $error");
+    return false;
   }
 }
